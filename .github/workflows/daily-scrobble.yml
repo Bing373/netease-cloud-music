@@ -1,0 +1,28 @@
+name: 网易云每日刷歌
+
+on:
+  schedule:
+    - cron: '0 1 * * *'  # 每天北京时间9点执行（UTC时间1点）
+  workflow_dispatch:      # 支持手动触发
+
+jobs:
+  scrobble:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: 设置 Go 环境
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          
+      - name: 编译 ncmctl
+        run: go build -o ncmctl ./cmd/ncmctl
+        
+      - name: 登录并执行每日任务
+        env:
+          NCM_USER: ${{ secrets.NCM_USER }}
+          NCM_PASSWORD: ${{ secrets.NCM_PASSWORD }}
+        run: |
+          ./ncmctl login -u $NCM_USER -p $NCM_PASSWORD
+          ./ncmctl task --sign --scrobble
