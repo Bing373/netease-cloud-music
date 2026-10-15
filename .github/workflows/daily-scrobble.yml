@@ -14,15 +14,18 @@ jobs:
       - name: 设置 Go 环境
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version: '1.23'
           
       - name: 编译 ncmctl
         run: go build -o ncmctl ./cmd/ncmctl
         
       - name: 登录并执行每日任务
         env:
-          NCM_USER: ${{ secrets.NCM_USER }}
-          NCM_PASSWORD: ${{ secrets.NCM_PASSWORD }}
+          NCM_COOKIE: ${{ secrets.NCM_COOKIE }}
         run: |
-          ./ncmctl login -u $NCM_USER -p $NCM_PASSWORD
+          # 将 Cookie 写入临时文件（匹配工具官方用法）
+          echo "$NCM_COOKIE" > cookie.txt
+          # 使用 Cookie 文件登录
+          ./ncmctl login cookie --file cookie.txt
+          # 执行每日任务：签到 + 刷歌300首
           ./ncmctl task --sign --scrobble
