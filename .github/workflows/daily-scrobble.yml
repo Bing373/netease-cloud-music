@@ -2,7 +2,7 @@ name: 网易云每日刷歌
 
 on:
   schedule:
-    - cron: '1 0/8 * * *'  
+    - cron: '1 0/6 * * *'  
   workflow_dispatch:      # 支持手动触发
 
 jobs:
